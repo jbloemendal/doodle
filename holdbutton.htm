@@ -1,0 +1,84 @@
+<html>
+<head>
+    <title>hold button</title>
+    <style>
+        #holdButton {
+            width: 50px;
+            height: 25px;
+            border: 1px solid black;
+            border-radius: 7px;
+            position: absolute;
+            cursor: pointer; 
+        }
+        #holdButton .text {
+            width: 50px;
+            height: 25px;
+            border-radius: 7px;
+            text-align: center;
+            position: fixed;
+            margin-top: 5px;
+        }
+        #holdButton .hold {
+            height: 25px;
+            border-radius: 7px;
+            background-color: greenyellow;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <h2>hold button</h2>
+    <div id="holdButton">
+        <span id="holdMoment" class="hold"></span>
+        <span class="text">ok</span>
+    </div>
+    <script type="text/javascript">
+    {
+        class HoldButton {
+            constructor(id, hold, callback=null) {
+                this._id=id;
+                this._timer=null;
+                this._interval=null;
+                this._hold=0;
+                this._holdsec=hold;
+                this._callback=callback;
+                this._holdButton = document.getElementById('holdButton');
+                this._holdMoment = document.getElementById('holdMoment');
+                this._moment = this._holdButton.clientWidth/hold;
+                this.addEvents();
+            }
+
+            addEvents() {
+                var self = this;
+
+                this._holdButton.addEventListener('mouseup', function() {
+                    self._hold=0;
+                    self._holdMoment.style.width=self._hold;
+                    window.clearInterval(self._interval);
+                    window.clearTimeout(self._timer);
+                });
+
+                this._holdButton.addEventListener('mousedown', function() {
+                    self._interval = window.setInterval(function() {
+                        self._hold += self._moment;
+                        self._holdMoment.style.width=self._hold;
+                        self._holdMoment.style.backgroundColor='greenyellow';
+                    }, 1000);
+                    self._timer = window.setTimeout(function() {
+                        window.clearInterval(self._interval);
+                        self._holdMoment.style.width=50
+                        self._holdMoment.style.backgroundColor='sandybrown';
+                        if (self._callback) {
+                            self._callback();
+                        }
+                    }, self._holdsec*1000);
+                });
+            }
+
+        }
+
+        var holdButton = new HoldButton('holdButton', 5, function() { alert('send'); });
+    }
+    </script>
+</body>
+</html>
