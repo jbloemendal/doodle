@@ -1,0 +1,84 @@
+<html>
+<head>
+    <title>mindfullness</title>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h2>mindfullness</h2>
+<canvas id="histogram" width="700" height="300" style="border:1px solid #000000;"></canvas><br />
+
+<script>
+var c = document.getElementById('histogram');
+var ctx = c.getContext('2d');
+ctx.fillText('0', 00, 10);
+ctx.fillText('100', 700/1000*100, 10);
+ctx.fillText('500', 700/1000*500, 10);
+ctx.fillText('1000', 700/1000*1000, 10);
+
+var maxV = 1000;
+var timestamp = null;
+var lastMouseX = null;
+var lastMouseY = null;
+
+document.body.addEventListener('mousemove', function(e) {
+
+    if (timestamp === null) {
+        timestamp = Date.now();
+        lastMouseX = e.screenX;
+        lastMouseY = e.screenY;
+        return;
+    }
+
+    var now = Date.now();
+    var dt =  now - timestamp;
+    var dx = e.screenX - lastMouseX;
+    var dy = e.screenY - lastMouseY;
+    var vX = Math.abs(Math.round(dx / dt * 100));
+    var vY = Math.abs(Math.round(dy / dt * 100));
+
+    timestamp = now;
+    lastMouseX = e.screenX;
+    lastMouseY = e.screenY;
+
+    v = 0;
+    if (vX > vY) {
+        v = vX;
+    } else {
+        v = vY;
+    }
+    if (v > maxV) {
+        v = maxV;
+    }
+    relV = v / maxV;
+
+    var gradA = [0xc7, 0x79, 0xd0];
+    var gradB = [0xfe, 0xac, 0x5e];
+
+
+    grad = [gradA[0]+Math.round((gradB[0]-gradA[0])*relV), gradA[1]+Math.round((gradB[1]-gradA[1])*relV), gradA[2]+Math.round((gradB[2]-gradA[2])*relV)];
+    
+    for (var i=0; i<3; i++) {
+        if (grad[i] > 255) {
+            grad[i] = 255;
+        } else if (grad[i] < 0) {
+            grad[i] = 0;
+        }
+    }
+
+    ctx.beginPath();
+    ctx.strokeStyle='#'+grad[0].toString(16)+''+grad[1].toString(16)+grad[2].toString(16);
+    ctx.moveTo(700*relV, 300);
+    ctx.lineTo(700*relV, 20);
+    ctx.stroke(); 
+    ctx.closePath();
+
+});
+
+</script>
+</body>
+</html>
