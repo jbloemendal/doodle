@@ -18,6 +18,18 @@
             position: absolute;
             cursor: pointer; 
         }
+        #holdButton.active {
+            box-shadow: 0px 0px inset;
+            border-style: solid;
+        }
+        #holdButton.pace0 {
+            box-shadow: 1px 1px;
+            border-style: solid;
+        }
+        #holdButton.pace1 {
+            box-shadow: 0px 0px;
+            border-style: dashed;
+        }
         #holdButton .text {
             width: 50px;
             height: 25px;
@@ -32,6 +44,7 @@
             background-color: greenyellow;
             position: absolute;
         }
+
     </style>
 </head>
 <body>
@@ -73,7 +86,9 @@
                 }
                 self._adjust = window.setTimeout(function() {
                     self._maxV = 130;
-                    self._holdButton.style.borderStyle='solid';
+                    if (self._holdButton.className !== 'active') {
+                        self._holdButton.className='pace0';
+                    }
                 }, 3000);
             }
 
@@ -103,18 +118,16 @@
                     if (self._maxV < v) {
                         self._maxV = v;
                     }
-                    if (self._maxV > 200) {
-                        self._holdButton.style.borderStyle='dashed';
-                        self.readjust();
-                    } else if (self._maxV > 130) {
-                        self._holdButton.style.borderStyle='dotted';
+                    if (self._maxV > 130) {
+                        self._holdButton.className='pace1';
                         self.readjust();
                     } else {
-                        self._holdButton.style.borderStyle='solid';
+                        self._holdButton.className='pace0';
                     }
                 });
 
                 this._holdButton.addEventListener('mouseup', function() {
+                    self._holdButton.className='pace0';
                     self._hold=0;
                     self._holdMoment.style.width=self._hold;
                     window.clearInterval(self._interval);
@@ -122,9 +135,8 @@
                 });
 
                 this._holdButton.addEventListener('mousedown', function() {
-                    if (self._maxV > 200) {
-                        self.setHold(self._secs[2]);
-                    } else if (self._maxV > 130) {
+                    self._holdButton.className='active';
+                    if (self._maxV > 130) {
                         self.setHold(self._secs[1]);
                     } else {
                         self.setHold(self._secs[0]);
@@ -133,7 +145,7 @@
                     self._interval = window.setInterval(function() {
                         self._hold += self._moment;
                         self._holdMoment.style.width=self._hold;
-                        self._holdMoment.style.backgroundColor='greenyellow';
+                        self._holdMoment.style.backgroundColor='greenyellow'; //todo
                     }, 1000);
                     self._timer = window.setTimeout(function() {
                         window.clearInterval(self._interval);
@@ -148,7 +160,7 @@
 
         }
 
-        var mindfullButton = new MindfullButton('holdButton', [2,4,7], function() { alert('send'); });
+        var mindfullButton = new MindfullButton('holdButton', [2,4], function() {  });
     }
     </script>
 </body>
