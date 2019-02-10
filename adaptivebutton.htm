@@ -1,0 +1,155 @@
+<html>
+<head>
+    <title>mindfull button</title>
+    <style>
+        html, body {
+            widht: 100%;
+            height: 100%;
+        }
+        #holdButton {
+            width: 50px;
+            height: 25px;
+            top: 50%;
+            left: 50%;
+            margin-left: -25px;
+            margin-top: -15px;
+            border: 2px solid black;
+            border-radius: 7px;
+            position: absolute;
+            cursor: pointer; 
+        }
+        #holdButton .text {
+            width: 50px;
+            height: 25px;
+            border-radius: 7px;
+            text-align: center;
+            position: fixed;
+            margin-top: 5px;
+        }
+        #holdButton .hold {
+            height: 25px;
+            border-radius: 7px;
+            background-color: greenyellow;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <h2>mindfull button</h2>
+    <div id="holdButton">
+        <span id="holdMoment" class="hold"></span>
+        <span class="text">ok</span>
+    </div>
+    <script type="text/javascript">
+    {
+        class MindfullButton {
+            constructor(id, secs, callback=null) {
+                this._id=id;
+                this._timer=null;
+                this._interval=null;
+                this._hold=0;
+                this._maxV=0;
+                this._callback=callback;
+                this._holdMoment = document.getElementById('holdMoment');
+                this._holdButton = document.getElementById('holdButton');
+                this._secs = secs;
+                self._slowReset = null;
+                this.setHold(secs[0]);
+                this.addEvents();
+            }
+
+            setHold(sec) {
+                console.log('setHold '+sec);
+                this._holdsec=sec;
+                this._holdButton = document.getElementById('holdButton');
+                this._moment = this._holdButton.clientWidth/sec;
+            }
+
+            readjust() {
+                var self = this;
+
+                if (self._adjust) {
+                    window.clearTimeout(self._adjust);
+                }
+                self._adjust = window.setTimeout(function() {
+                    self._maxV = 130;
+                    self._holdButton.style.borderStyle='solid';
+                }, 3000);
+            }
+
+            addEvents() {
+                var self = this;
+
+                document.body.addEventListener('mousemove', function(e) {
+                    if (self._timestamp === null) {
+                        self._timestamp = Date.now();
+                        self._lastMouseX = e.screenX;
+                        self._lastMouseY = e.screenY;
+                        return;
+                    }
+
+                    var now = Date.now();
+                    var dt =  now - self._timestamp;
+                    var dx = e.screenX - self._lastMouseX;
+                    var dy = e.screenY - self._lastMouseY;
+                    var vX = Math.abs(Math.round(dx / dt * 100));
+                    var vY = Math.abs(Math.round(dy / dt * 100));
+
+                    self._timestamp = now;
+                    self._lastMouseX = e.screenX;
+                    self._lastMouseY = e.screenY;
+
+                    var v = vX > vY? vX : vY;
+                    if (self._maxV < v) {
+                        self._maxV = v;
+                    }
+                    if (self._maxV > 200) {
+                        self._holdButton.style.borderStyle='dashed';
+                        self.readjust();
+                    } else if (self._maxV > 130) {
+                        self._holdButton.style.borderStyle='dotted';
+                        self.readjust();
+                    } else {
+                        self._holdButton.style.borderStyle='solid';
+                    }
+                });
+
+                this._holdButton.addEventListener('mouseup', function() {
+                    self._hold=0;
+                    self._holdMoment.style.width=self._hold;
+                    window.clearInterval(self._interval);
+                    window.clearTimeout(self._timer);
+                });
+
+                this._holdButton.addEventListener('mousedown', function() {
+                    if (self._maxV > 200) {
+                        self.setHold(self._secs[2]);
+                    } else if (self._maxV > 130) {
+                        self.setHold(self._secs[1]);
+                    } else {
+                        self.setHold(self._secs[0]);
+                    }
+
+                    self._interval = window.setInterval(function() {
+                        self._hold += self._moment;
+                        self._holdMoment.style.width=self._hold;
+                        self._holdMoment.style.backgroundColor='greenyellow';
+                    }, 1000);
+                    self._timer = window.setTimeout(function() {
+                        window.clearInterval(self._interval);
+                        self._holdMoment.style.width=50
+                        self._holdMoment.style.backgroundColor='sandybrown';
+                        if (self._callback) {
+                            self._callback();
+                        }
+                    }, self._holdsec*1000);
+                });
+            }
+
+        }
+
+        var mindfullButton = new MindfullButton('holdButton', [2,4,7], function() { alert('send'); });
+    }
+    </script>
+</body>
+</html>
