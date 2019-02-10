@@ -61,7 +61,7 @@
                 this._timer=null;
                 this._interval=null;
                 this._hold=0;
-                this._maxV=0;
+                this._v=0;
                 this._callback=callback;
                 this._holdMoment = document.getElementById('holdMoment');
                 this._holdButton = document.getElementById('holdButton');
@@ -85,7 +85,7 @@
                     window.clearTimeout(self._adjust);
                 }
                 self._adjust = window.setTimeout(function() {
-                    self._maxV = 130;
+                    self._v = 130;
                     if (self._holdButton.className !== 'active') {
                         self._holdButton.className='pace0';
                     }
@@ -107,18 +107,16 @@
                     var dt =  now - self._timestamp;
                     var dx = e.screenX - self._lastMouseX;
                     var dy = e.screenY - self._lastMouseY;
-                    var vX = Math.abs(Math.round(dx / dt * 100));
-                    var vY = Math.abs(Math.round(dy / dt * 100));
+                    var vd = Math.abs(Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2)) / dt * 100);
+                    if (self._v < vd) {
+                        self._v = vd;
+                    }
 
                     self._timestamp = now;
                     self._lastMouseX = e.screenX;
                     self._lastMouseY = e.screenY;
 
-                    var v = vX > vY? vX : vY;
-                    if (self._maxV < v) {
-                        self._maxV = v;
-                    }
-                    if (self._maxV > 130) {
+                    if (self._v > 130) {
                         self._holdButton.className='pace1';
                         self.readjust();
                     } else {
@@ -136,7 +134,7 @@
 
                 this._holdButton.addEventListener('mousedown', function() {
                     self._holdButton.className='active';
-                    if (self._maxV > 130) {
+                    if (self._v > 130) {
                         self.setHold(self._secs[1]);
                     } else {
                         self.setHold(self._secs[0]);
@@ -160,7 +158,7 @@
 
         }
 
-        var mindfullButton = new MindfullButton('holdButton', [2,4], function() {  });
+        var mindfullButton = new MindfullButton('holdButton', [2, 5], function() { console.log('triggered'); });
     }
     </script>
 </body>

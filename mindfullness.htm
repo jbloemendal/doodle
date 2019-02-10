@@ -23,7 +23,7 @@ ctx.fillText('500', 700/1000*500, 10);
 ctx.fillText('500', 700/1000*500, 10);
 ctx.fillText('1000', 700/1000*1000, 10);
 
-var maxV = 1000;
+var max = 1000;
 var timestamp = null;
 var lastMouseX = null;
 var lastMouseY = null;
@@ -41,29 +41,22 @@ document.body.addEventListener('mousemove', function(e) {
     var dt =  now - timestamp;
     var dx = e.screenX - lastMouseX;
     var dy = e.screenY - lastMouseY;
-    var vX = Math.abs(Math.round(dx / dt * 100));
-    var vY = Math.abs(Math.round(dy / dt * 100));
+    var vd = Math.abs(Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2)) / dt * 100);
 
     timestamp = now;
     lastMouseX = e.screenX;
     lastMouseY = e.screenY;
 
-    v = 0;
-    if (vX > vY) {
-        v = vX;
-    } else {
-        v = vY;
+    if (vd > max) {
+        vd = max;
     }
-    if (v > maxV) {
-        v = maxV;
-    }
-    relV = v / maxV;
+    relv = vd / max;
 
     var gradA = [0xc7, 0x79, 0xd0];
     var gradB = [0xfe, 0xac, 0x5e];
 
 
-    grad = [gradA[0]+Math.round((gradB[0]-gradA[0])*relV), gradA[1]+Math.round((gradB[1]-gradA[1])*relV), gradA[2]+Math.round((gradB[2]-gradA[2])*relV)];
+    grad = [gradA[0]+Math.round((gradB[0]-gradA[0])*relv), gradA[1]+Math.round((gradB[1]-gradA[1])*relv), gradA[2]+Math.round((gradB[2]-gradA[2])*relv)];
     
     for (var i=0; i<3; i++) {
         if (grad[i] > 255) {
@@ -75,8 +68,8 @@ document.body.addEventListener('mousemove', function(e) {
 
     ctx.beginPath();
     ctx.strokeStyle='#'+grad[0].toString(16)+''+grad[1].toString(16)+grad[2].toString(16);
-    ctx.moveTo(700*relV, 300);
-    ctx.lineTo(700*relV, 20);
+    ctx.moveTo(700*relv, 300);
+    ctx.lineTo(700*relv, 20);
     ctx.stroke(); 
     ctx.closePath();
 
