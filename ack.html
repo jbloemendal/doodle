@@ -1,0 +1,59 @@
+<html>
+<head>
+    <title>ackbutton</title>
+    <style>
+        #ackbutton {
+            position: relative;
+            left: 76px;
+            top: 5px;
+            width: 75;
+            height: 55;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h2>AckButton</h2>
+    <input id="ackbutton" type="button" value="ack" style="width: 70px;"></input>
+    <br /><br />
+    <script type="text/javascript">
+    {
+        class AckButton {
+            constructor(id, callback=null) {
+                this.id = id;
+                this.callback = callback;
+                this.addEvents();
+            }
+
+            addEvents() {
+                var self = this;
+                var ackb = document.getElementById('ackbutton');
+                ackb.addEventListener('mousedown', function() {
+                    if (self.interval) {
+                        if (ackb.value === "ok") {
+                            window.clearInterval(self.interval);
+                            self.interval = null;
+                            self.callback();
+                            ackb.value = "ack";
+                        }
+                    } else {
+                        ackb.value = "ck";
+                        self.interval = window.setInterval(function() {
+                            ackb.value = "ok";
+                            window.clearInterval(self.interval);
+                            self.interval = window.setInterval(function() {
+                                ackb.value="ack";
+                            }, 5000);
+                        }, 2000);
+                    }
+                });
+            }
+        }
+
+        var ackb = new AckButton('ackbutton', function() { 
+            document.body.append(document.createTextNode(' test ok '));
+        });
+    }
+    </script>
+</body>
+</html>

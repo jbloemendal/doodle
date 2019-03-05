@@ -1,0 +1,51 @@
+<html>
+<head>
+    <title>chk-button</title>
+    <style>
+        #wrapchkbutton input[type="checkbox"] {
+            position: relative;
+            left: 76px;
+            top: 5px;
+            width: 18px;
+            height: 18px;
+        }
+        #wrapchkbutton input[type="button"] {
+            background-color: coral;
+        }
+    </style>
+</head>
+<body>
+    <h2>Chk-Button</h2>
+    <div id="wrapchkbutton">
+        <input id="chkcheck" type="checkbox"></input>
+        <input id="chkbutton" type="button" value="ok" style="width: 70px;"></input>
+    </div>
+    <script type="text/javascript">
+    {
+        class ChkButton {
+            constructor(id, callback=null) {
+                this.id=id;
+                this.callback = callback;
+                this.addEvents();
+            }
+
+            addEvents() {
+                var self = this;
+                var xkc = document.getElementById('chkcheck'); 
+                var xkb = document.getElementById('chkbutton'); 
+                xkc.addEventListener('mousedown', function() {
+                    xkb.style.backgroundColor = this.checked ? 'coral' : 'lightgreen';
+                });
+                xkb.addEventListener('mouseup', function() {
+                    if (xkc.checked) {
+                        self.callback();
+                    }
+                });
+            }
+        }
+
+        var xkb = new ChkButton('chkbutton', function() { alert('send'); });
+    }
+    </script>
+</body>
+</html>
